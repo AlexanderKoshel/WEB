@@ -2,6 +2,7 @@ module.exports = {
   entry: {
     gettingStarted: "./gettingStarted.jsx",
     p2: "./p2.jsx",
+    mySearch: "./mySearch.jsx",
    
   },
   module: {

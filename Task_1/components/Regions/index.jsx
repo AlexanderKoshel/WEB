@@ -1,47 +1,41 @@
-import React from "react"; 
+import React, { useState } from "react";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import "../../styles/main.css";
 import "./styles.css";
 
-/**
- * Define Regions, a React component of lab1. The model
- * data for this view (the regions names) is available at
- * window.regionsModel.regionsModel().
- */
-class Regions extends React.Component {
-  constructor(props) {
-    super(props);
-    console.log(
-      "window.lab1models.regionsModel()",
-      window.lab1models.regionsModel()
-    );
-    this.state={substr : "",};
+function Regions() {
+  const [substr, setSubstr] = useState("");
+  const query = substr.toLocaleLowerCase("ru");
+  const regions = window.lab1models.regionsModel()
+    .filter((name) => name.toLocaleLowerCase("ru").includes(query))
+    .sort((left, right) => left.localeCompare(right, "ru"));
 
-    
-     this.handleChangeSubstr = (event) => this.handleChange(event);
-  }
-handleChange(event) {
- //  Insert your code here
-    
-  } 
-  render() {
-    return (
-	<div>
-           <div className="state-search">
-            {			  
-            this.state.substr
-            }
-           </div>
-           <div className="lab1-example-output"><span id='IInfo'></span></div> 
-          <label htmlFor="substrId">Enter substring to search:</label>
-          <input
-            id="substrId"
-            type="text"
-            value={this.state.substr}
-            onChange={this.handleChangeSubstr}
-          />
-              
-    </div>
-    );
-  }
+  return (
+    <main className="container Regions">
+      <nav aria-label="Навигация">
+        <a href="/">Главная</a>
+        <a href="getting-started.html">Пример React</a>
+        <a href="MySearch.html">Меню ресторана</a>
+      </nav>
+      <h1>Области Беларуси</h1>
+      <label htmlFor="substrId">Введите подстроку для поиска</label>
+      <input
+        id="substrId"
+        type="search"
+        value={substr}
+        onChange={(event) => setSubstr(event.target.value)}
+      />
+      <p className="state-search">Искомая подстрока: {substr}</p>
+      <section aria-label="Результаты поиска" aria-live="polite">
+        {regions.length > 0 ? (
+          <List aria-label="Найденные области">
+            {regions.map((name) => <ListItem key={name}>{name}</ListItem>)}
+          </List>
+        ) : <p>Совпадений не найдено</p>}
+      </section>
+    </main>
+  );
 }
 
 export default Regions;

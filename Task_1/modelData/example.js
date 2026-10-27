@@ -16,6 +16,6 @@ if (lab1models === undefined) {
 
 lab1models.exampleModel = function () {
   return {
-    name: "Unknown Name",
+    name: "Кошель Александр Ростиславович",
   };
 };

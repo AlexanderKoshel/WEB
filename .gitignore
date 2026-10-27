@@ -1,0 +1,11 @@
+node_modules/
+compiled/
+*.log
+.DS_Store
+Thumbs.db
+
+# Условия и дополнительные материалы остаются только локально.
+materials/
+Task_1/*.doc
+Task_1/*.docx
+Task_1/*.zip

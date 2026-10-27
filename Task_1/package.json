@@ -6,12 +6,14 @@
   "main": "webServer.js",
   "scripts": {
     "build": "webpack --devtool eval-cheap-module-source-map --output-pathinfo",
-    "build:w": "webpack --devtool eval-cheap-module-source-map --output-pathinfo --watch" 
-    
+    "build:w": "webpack --devtool eval-cheap-module-source-map --output-pathinfo --watch",
+    "start": "node webServer.js"
   },
-  
   "license": "ISC",
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^5.18.0",
     "express": "^4.17.2",
     "file-loader": "^6.2.0",
     "prismjs": "^1.26.0",
@@ -22,13 +24,13 @@
     "url-loader": "^4.1.1"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.16.5",
     "@babel/core": "^7.16.12",
-    "babel-jest": "^27.4.6",
-    "babel-loader": "^8.2.3",
+    "@babel/eslint-parser": "^7.16.5",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-stage-2": "^7.8.3",
+    "babel-jest": "^27.4.6",
+    "babel-loader": "^8.2.3",
     "css-loader": "^6.5.1",
     "eslint": "^8.7.0",
     "eslint-config-airbnb": "^19.0.4",

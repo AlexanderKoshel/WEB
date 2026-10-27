@@ -1,51 +1,54 @@
-import React  from "react"; 
+import React from "react";
 import ReactDOM from "react-dom";
-import { useState } from "react"; 
-import { HashRouter, BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import { HashRouter, Route, Switch, NavLink, Redirect } from "react-router-dom";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
 import Example from "./components/Example";
-import States from "./components/Regions";
+import Regions from "./components/Regions";
+import MySearch from "./components/MySearch/MySearch";
+import "./styles/main.css";
 
 function App() {
-	return (
-    <HashRouter> 
-      <div>
-        <ul>
-          <li>
-            <Link to="/example">Example</Link>
-          </li>
-          <li>
-            <Link to="/regions">Regions</Link>
-          </li>
-          
-        </ul>
-
-        <hr />
-
-        {/*
-          A <Switch> looks through all its children <Route>
-          elements and renders the first one whose path
-          matches the current URL. Use a <Switch> any time
-          you have multiple routes, but you want only one
-          of them to render at a time
-        */}
-        <Switch>
-          <Route exact path="/example">
-            <Example />
-          </Route>
-          <Route path="/regions">
-            <Regions />
-          </Route>
-          <Route path="/dashboard">
-            <Regions />
-          </Route>
-        </Switch>
-      </div>
+  return (
+    <HashRouter>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="h1">
+            Лабораторная №1 — React SPA
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Grid container className="spa-layout">
+        <Grid item xs={12} sm={3} component="aside" className="spa-sidebar">
+          <nav aria-label="Компоненты приложения">
+            <List>
+              <ListItemButton component={NavLink} to="/example" activeClassName="spa-active">
+                Example
+              </ListItemButton>
+              <ListItemButton component={NavLink} to="/regions" activeClassName="spa-active">
+                Regions
+              </ListItemButton>
+              <ListItemButton component={NavLink} to="/mysearch" activeClassName="spa-active">
+                MySearch
+              </ListItemButton>
+            </List>
+          </nav>
+        </Grid>
+        <Grid item xs={12} sm={9} component="main" className="spa-content">
+          <Switch>
+            <Route exact path="/example"><Example embedded /></Route>
+            <Route exact path="/regions"><Regions embedded /></Route>
+            <Route exact path="/mysearch"><MySearch embedded /></Route>
+            <Redirect to="/example" />
+          </Switch>
+        </Grid>
+      </Grid>
     </HashRouter>
   );
-	
-	}
-ReactDOM.render(
-	
-		<App />, document.getElementById("reactapp")
-	
-	);
+}
+
+ReactDOM.render(<App />, document.getElementById("reactapp"));

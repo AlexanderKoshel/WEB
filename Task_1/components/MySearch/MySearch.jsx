@@ -3,7 +3,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import "../../styles/main.css";
 
-function MySearch() {
+function MySearch({ embedded = false }) {
   const [substr, setSubstr] = useState("");
   const query = substr.toLocaleLowerCase("ru");
   const dishes = window.lab1models.myDataModel()
@@ -11,12 +11,12 @@ function MySearch() {
     .sort((left, right) => left.localeCompare(right, "ru"));
 
   return (
-    <main className="container MySearch">
-      <nav aria-label="Навигация">
+    <section className="container MySearch">
+      {!embedded && <nav aria-label="Навигация">
         <a href="/">Главная</a>
         <a href="getting-started.html">Пример React</a>
         <a href="p2.html">Области Беларуси</a>
-      </nav>
+      </nav>}
       <h1>Меню ресторана</h1>
       <p>Найдите блюдо по части его названия.</p>
       <label htmlFor="dishSearch">Введите подстроку для поиска</label>
@@ -34,7 +34,7 @@ function MySearch() {
           </List>
         ) : <p>Совпадений не найдено</p>}
       </section>
-    </main>
+    </section>
   );
 }
 

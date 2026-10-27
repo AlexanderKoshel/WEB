@@ -3,6 +3,7 @@ module.exports = {
     gettingStarted: "./gettingStarted.jsx",
     p2: "./p2.jsx",
     mySearch: "./mySearch.jsx",
+    p5: "./p5.jsx",
    
   },
   module: {

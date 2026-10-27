@@ -4,7 +4,7 @@ import "prismjs/components/prism-jsx.js";
 import "prismjs/themes/prism.css";
 import "./styles.css";
 
-function Example() {
+function Example({ embedded = false }) {
   const [name] = useState(() => window.lab1models.exampleModel().name);
   const [motto, setMotto] = useState("Мой первый React-компонент");
   const [counter, setCounter] = useState(0);
@@ -19,12 +19,12 @@ function Example() {
   }, []);
 
   return (
-    <main className="container Example">
-      <nav aria-label="Навигация">
+    <section className="container Example">
+      {!embedded && <nav aria-label="Навигация">
         <a href="/">Главная</a>
         <a href="p2.html">Области Беларуси</a>
         <a href="MySearch.html">Меню ресторана</a>
-      </nav>
+      </nav>}
       <h1>Первый React-компонент</h1>
       <p className="lab1-example-output">Меня зовут {name}.</p>
 
@@ -51,7 +51,7 @@ function Example() {
         useEffect запускает таймер при открытии страницы и очищает его
         при удалении компонента.
       </p>
-    </main>
+    </section>
   );
 }
 

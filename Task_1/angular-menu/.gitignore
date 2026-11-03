@@ -2,3 +2,4 @@
 /dist/
 /.angular/
 /.firebase/
+/public/firebase-config.json

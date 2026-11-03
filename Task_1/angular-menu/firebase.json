@@ -1,0 +1,7 @@
+{
+  "hosting": {
+    "public": "dist/angular-menu/browser",
+    "rewrites": [{"source": "**", "destination": "/index.html"}]
+  },
+  "firestore": {"rules": "firestore.rules"}
+}

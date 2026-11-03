@@ -1,25 +1,26 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Menu } from '../menu';
-import { menus } from '../mock-menu-list';
+import { FirestoreService } from './firestore.service';
 
 @Injectable({ providedIn: 'root' })
 export class MenuService {
-  protected readonly items = signal(menus);
+  private readonly firestore = inject(FirestoreService);
+  private readonly items = signal<Menu[]>([]);
   readonly dishes = this.items.asReadonly();
+
+  constructor() {
+    void this.firestore.watch(dishes => this.items.set(dishes));
+  }
 
   find(id: string) {
     return this.dishes().find(dish => dish.id === id);
   }
 
-  async save(id: string, fields: Omit<Menu, 'id'>) {
-    if (id) {
-      this.items.update(items => items.map(dish => dish.id === id ? { id, ...fields } : dish));
-      return;
-    }
-    this.items.update(items => [...items, { id: crypto.randomUUID(), ...fields }]);
+  save(id: string, fields: Omit<Menu, 'id'>) {
+    return this.firestore.save(id, fields);
   }
 
-  async remove(id: string) {
-    this.items.update(items => items.filter(dish => dish.id !== id));
+  remove(id: string) {
+    return this.firestore.remove(id);
   }
 }

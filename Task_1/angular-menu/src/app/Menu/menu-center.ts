@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { FirestoreService } from './services/firestore.service';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
@@ -8,7 +9,12 @@ import { RouterLink, RouterOutlet } from '@angular/router';
       <a routerLink="/menu">Список блюд</a>
       <a class="ms-3" routerLink="/menu/edit">Редактировать меню</a>
     </nav>
+    @if (firestore.error(); as error) {
+      <p class="alert alert-danger" role="alert">{{ error }}</p>
+    }
     <router-outlet />
   `,
 })
-export class MenuCenter {}
+export class MenuCenter {
+  readonly firestore = inject(FirestoreService);
+}

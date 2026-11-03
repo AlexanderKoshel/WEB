@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /list-menu/{id} {
+      allow read: if true;
+      allow create, update: if request.auth != null && validDish();
+      allow delete: if request.auth != null;
+
+      function validDish() {
+        let data = request.resource.data;
+        return data.keys().hasOnly(['description', 'price'])
+          && data.keys().hasAll(['description', 'price'])
+          && data.description is string
+          && data.description.size() > 0 && data.description.size() <= 200
+          && data.price is number && data.price >= 0 && data.price <= 1000000;
+      }
+    }
+  }
+}

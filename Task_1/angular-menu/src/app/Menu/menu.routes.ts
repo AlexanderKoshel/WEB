@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { MenuCenter } from './menu-center';
 import { MenuDetails } from './menu-details';
+import { MenuEditor } from './menu-editor';
 import { MenuList } from './menu-list';
 
 export const menuRoutes: Routes = [{
@@ -8,6 +9,7 @@ export const menuRoutes: Routes = [{
   component: MenuCenter,
   children: [
     { path: '', component: MenuList },
+    { path: 'edit', component: MenuEditor },
     { path: ':id', component: MenuDetails },
   ],
 }];

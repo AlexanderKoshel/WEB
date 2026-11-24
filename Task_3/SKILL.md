@@ -5,7 +5,7 @@ description: Лабораторная WEB 3, вариант 10. Консольн
 
 # Система Ресторан
 
-Команды сборки, запуска, схема данных и проверочный сценарий приведены в `PLAN.md`. В первой части `JdbcMain` загружает настройки, создаёт `JdbcConnector` и передаёт его консоли. Консоль вызывает DAO, DAO получает соединение в рамках `Lease` и преобразует строки MySQL в данные для вывода.
+Команды сборки, запуска, схема данных и проверочный сценарий приведены в `PLAN.md`. В первой части `JdbcMain` загружает настройки, создаёт `JdbcConnector` и передаёт его консоли. Консоль вызывает DAO, DAO получает соединение в рамках `Lease` и преобразует строки MySQL в данные для вывода. Во второй части PoolMain использует тот же интерфейс ConnectionProvider для MyConnectionPool или DataSource.
 
 ### ФАЙЛ: `.gitignore`
 
@@ -13,7 +13,7 @@ description: Лабораторная WEB 3, вариант 10. Консольн
 
 **КАКИЕ ИСПОЛЬЗУЕТ МЕТОДЫ БИБЛИОТЕКИ:** вызовов нет.
 
-**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** `part1/target/`, `.env` и локальное условие.
+**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** `part1/target/`, `part2/target/`, `.env` и локальное условие.
 
 ### ФАЙЛ: `pom.xml`
 
@@ -21,7 +21,7 @@ description: Лабораторная WEB 3, вариант 10. Консольн
 
 **КАКИЕ ИСПОЛЬЗУЕТ МЕТОДЫ БИБЛИОТЕКИ:** декларативная конфигурация Maven.
 
-**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** родитель `part1/pom.xml`.
+**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** родитель `part1/pom.xml` и `part2/pom.xml`.
 
 ### ФАЙЛ: `compose.yaml`
 
@@ -85,7 +85,7 @@ description: Лабораторная WEB 3, вариант 10. Консольн
 
 **КАКИЕ ИСПОЛЬЗУЕТ МЕТОДЫ БИБЛИОТЕКИ:** JDBC `Connection.close()` в адаптере `Lease.closing()`.
 
-**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** общий контракт DAO и реализации `JdbcConnector`.
+**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** общий контракт DAO и реализаций `JdbcConnector`, `MyConnectionPool` и `DataSource`.
 
 ### ФАЙЛ: `part1/src/main/java/restaurant/db/DatabaseConfig.java`
 
@@ -93,7 +93,7 @@ description: Лабораторная WEB 3, вариант 10. Консольн
 
 **КАКИЕ ИСПОЛЬЗУЕТ МЕТОДЫ БИБЛИОТЕКИ:** Java `Class.getResourceAsStream()`, `Properties.load()`, `System.getenv()`.
 
-**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** читает `database.properties`, передаёт параметры `JdbcConnector`.
+**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** читает `database.properties`, передаёт параметры `JdbcConnector`, `MyConnectionPool` и `DataSource`.
 
 ### ФАЙЛ: `part1/src/main/java/restaurant/db/JdbcConnector.java`
 
@@ -126,6 +126,38 @@ description: Лабораторная WEB 3, вариант 10. Консольн
 **КАКИЕ ИСПОЛЬЗУЕТ МЕТОДЫ БИБЛИОТЕКИ:** Java `Stream.map()`, `Stream.reduce()`, `BigDecimal.multiply()`, `BigDecimal.add()`.
 
 **ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** создаётся `OrderDao`, выводится `RestaurantConsole`.
+
+### ФАЙЛ: `part2/pom.xml`
+
+**КАКИЕ ФУНКЦИИ ВЫПОЛНЯЕТ:** подключает первый модуль, HikariCP и адаптер SLF4J для JUL.
+
+**КАКИЕ ИСПОЛЬЗУЕТ МЕТОДЫ БИБЛИОТЕКИ:** декларативная конфигурация Maven и Exec Maven Plugin.
+
+**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** родительский `pom.xml`, артефакт `restaurant-part1`, точка входа `PoolMain`.
+
+### ФАЙЛ: `part2/src/main/java/restaurant/pool/PoolMain.java`
+
+**КАКИЕ ФУНКЦИИ ВЫПОЛНЯЕТ:** выбирает `custom` или `hikari`, запускает консоль с выбранным поставщиком, закрывает пул при выходе.
+
+**КАКИЕ ИСПОЛЬЗУЕТ МЕТОДЫ БИБЛИОТЕКИ:** Java `Set.of()`, `Set.contains()` и `Logger.log()`.
+
+**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** общие `DatabaseConfig` и `RestaurantConsole`, реализации `MyConnectionPool` и `DataSource`.
+
+### ФАЙЛ: `part2/src/main/java/restaurant/pool/MyConnectionPool.java`
+
+**КАКИЕ ФУНКЦИИ ВЫПОЛНЯЕТ:** резервирует места и выдаёт свободные соединения, ждёт возврата при заполнении и выбрасывает исключение по тайм-ауту. При возврате откатывает незавершённую транзакцию, включает auto-commit, сбрасывает режим только чтения и предупреждения. Закрывает свободные соединения при выключении пула и закрывает занятые при возврате.
+
+**КАКИЕ ИСПОЛЬЗУЕТ МЕТОДЫ БИБЛИОТЕКИ:** Java `ArrayDeque.pollFirst()`, `ArrayDeque.addLast()`, `TimeUnit.timedWait()`, `Object.notifyAll()`, `AtomicBoolean.compareAndSet()`, `Logger.log()`. JDBC `DriverManager.getConnection()`, `Connection.isValid()`, `getAutoCommit()`, `rollback()`, `setAutoCommit()`, `isReadOnly()`, `setReadOnly()`, `clearWarnings()`, `close()`.
+
+**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** реализует `ConnectionProvider`, получает параметры от `DatabaseConfig`. Очередь и счётчик защищены одним монитором. DAO возвращают аренду через try-with-resources.
+
+### ФАЙЛ: `part2/src/main/java/restaurant/pool/DataSource.java`
+
+**КАКИЕ ФУНКЦИИ ВЫПОЛНЯЕТ:** настраивает HikariCP, выдаёт его подключения DAO и закрывает источник данных при выходе.
+
+**КАКИЕ ИСПОЛЬЗУЕТ МЕТОДЫ БИБЛИОТЕКИ:** HikariCP `setPoolName()`, `setJdbcUrl()`, `setUsername()`, `setPassword()`, `setMaximumPoolSize()`, `setConnectionTimeout()`, `HikariDataSource.getConnection()`, `close()`.
+
+**ЗАВИСИМОСТИ И ВЗАИМОДЕЙСТВИЯ С ДРУГИМИ ФАЙЛАМИ:** реализует `ConnectionProvider` и использует `DatabaseConfig`. Закрытие аренды возвращает прокси-подключение в HikariCP.
 
 ### ФАЙЛ: `PLAN.md`
 
